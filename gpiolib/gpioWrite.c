@@ -12,19 +12,19 @@
 
 int gpiowrite(int bank, int pin, int value)
 {
-		int fd=open("/dev/mem", O_RDWR);//file descriptor
-		volatile void *gpioBaseAddress=NULL;//Allocated memory for the address's
 		unsigned volatile int *gpioWriteSet=NULL;
 		unsigned volatile int *gpioWriteClear=NULL;
 		unsigned int oeValue;//Will store the Output Enable values
 
-		switch(bank)//Seems much more efficient and cleaner to write...
-		{
-		case 0: gpioBaseAddress=mmap(0, 4096, PROT_READ | PROT_WRITE , MAP_SHARED, fd, GPIO0BASE); break;//Sets the base address depending on what the user selected
-		case 1: gpioBaseAddress=mmap(0, 4096, PROT_READ | PROT_WRITE , MAP_SHARED, fd, GPIO1BASE); break;
-		case 2: gpioBaseAddress=mmap(0, 4096, PROT_READ | PROT_WRITE , MAP_SHARED, fd, GPIO2BASE); break;
-		case 3: gpioBaseAddress=mmap(0, 4096, PROT_READ | PROT_WRITE , MAP_SHARED, fd, GPIO3BASE); break;
-		}
+
+		//Removed because of the addition of gpioinit.c
+//		switch(bank)//Seems much more efficient and cleaner to write...
+//		{
+//		case 0: gpioBaseAddress=mmap(0, 4096, PROT_READ | PROT_WRITE , MAP_SHARED, fd, GPIO0BASE); break;//Sets the base address depending on what the user selected
+//		case 1: gpioBaseAddress=mmap(0, 4096, PROT_READ | PROT_WRITE , MAP_SHARED, fd, GPIO1BASE); break;
+//		case 2: gpioBaseAddress=mmap(0, 4096, PROT_READ | PROT_WRITE , MAP_SHARED, fd, GPIO2BASE); break;
+//		case 3: gpioBaseAddress=mmap(0, 4096, PROT_READ | PROT_WRITE , MAP_SHARED, fd, GPIO3BASE); break;
+//		}
 
 
 		//Commented to test out switch statements above
@@ -58,25 +58,20 @@ int gpiowrite(int bank, int pin, int value)
 //		}
 
 		//Sets the memory addresses
-		gpioWriteSet=gpioBaseAddress+GPIOSETDATOUT;
-		gpioWriteClear=gpioBaseAddress+GPIOCLRDATOUT;
+		gpioWriteSet=gpioAddress[bank]+GPIOSETDATOUT;
+		gpioWriteClear=gpioAddress[bank]+GPIOCLRDATOUT;
 
 		if(value==0)
 		{
 			//write 1 to the clear register
-			gpioWriteClear=(1<<pin);
+			*gpioWriteClear=(1<<pin);
 		}
 
 		if(value==1)
 		{
 			//write 0 to the set register
-			gpioWriteSet=(1<<pin);
+			*gpioWriteSet=(1<<pin);
 		}
-
-		//Clear all the memory address
-		gpioWriteSet=NULL;
-		gpioWriteClear=NULL;
-		munmap(gpioBaseAddress, 4096);
 
 	return 0;
 }

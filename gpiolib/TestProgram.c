@@ -18,14 +18,21 @@ int main(void)
 	int errorCheck;
 	int loop=1;
 	int pinValue;
+	int value;
 
+	int didItInit=gpioinit();
+	if(didItInit==-1)
+	{
+		fprintf(stderr,"\n%s", "Could not initialize a gpio bank");
+		return -1;
+	}
 	system("clear");
 	printf("%s\n", "What GPIO bank do you wish to set as input or output? 0, 1, 2, or 3: ");
 	fflush(stdout);
 	fscanf(stdin, "%ui1", &bank);
 	fflush(stdin);
 
-	printf("\n%s\n", "What pin do you wish to edit the value of? 0-31: ");
+	printf("\n%s\n", "What pin do you wish to edit or read the value of? 0-31: ");
 	fflush(stdout);
 	fscanf(stdin,"%ui2", &pin);
 	fflush(stdin);
@@ -35,17 +42,19 @@ int main(void)
 	fscanf(stdin,"%s3", direction);
 	fflush(stdin);
 
-	printf("\n%s\n", "Here is what you typed");
-	printf("\n%s%u\n", "Bank:", bank);
-	printf("\n%s%u\n", "Pin:", pin);
-	printf("\n%s%s\n", "Direction:", direction);
+	printf("\n%s\n", "Should the pin be high(1) or low(0) if output (Ignored it not)?: ");
+	fflush(stdout);
+	fscanf(stdin,"%ui2", &value);
+	fflush(stdin);
 
-	errorCheck=gpiodirection(bank, pin, direction);
-	if(errorCheck==-1)
-	{
-		fprintf(stderr,"\n%s\n", "Error changing direction pin.");
-		return -1;
-	}
+	printf("\n%s", "Here is what you typed");
+	printf("\n%s%u", "Bank:", bank);
+	printf("\n%s%u", "Pin:", pin);
+	printf("\n%s%s", "Direction:", direction);
+	printf("\n%s%u\n", "Value to write:", pin);
+
+	gpiodirection(bank, pin, direction);
+
 	if(strncmp("in",direction,2)==0)
 	{
 		pinValue=gpioRead(bank,pin);
@@ -58,5 +67,10 @@ int main(void)
 			printf("\n%s%u","Current Value:", pinValue);
 		}
 	}
+	if(strncmp("ou",direction,2)==0)
+	{
+		gpiowrite(bank, pin, value);
+	}
+	gpiodone();
 	return 0;
 }

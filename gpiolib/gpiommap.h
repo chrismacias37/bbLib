@@ -8,6 +8,7 @@
 
 #include<stdio.h>
 #include <sys/mman.h>
+#include<fcntl.h>
 
 #ifndef GPIOMMAP_H_
 #define GPIOMMAP_H_
@@ -27,6 +28,14 @@
 #define GPIOCLRDATOUT 0x190 //Turn off the gpio for selected pin
 #define GPIOSETDATOUT 0x194 //Turn on the gpio for selected pin
 
+/*
+ * This is an attempt to make the program more efficient. Ill be making a data structure to store the address of gpio addresses
+ */
+
+void volatile *gpioAddress[4];//Will store the address to the gpioBanks
+
+int gpioinit();//Sets the address to the gpioBanks.
+int gpioDone();//Clears the allocated memory.
 int gpiodirection(int bank, int pin, char *direction);
 int gpioRead(int bank, int pin);
 int gpiowrite(int bank, int pin, int value);
