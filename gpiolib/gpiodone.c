@@ -6,7 +6,7 @@
  */
 
 
-int gpioDone(void)
+int gpioDone(int fd)
 {
 	int counter1;
 
@@ -14,5 +14,6 @@ int gpioDone(void)
 	{
 		munmap(gpioAddress[counter1] ,4096);
 	}
+	close(fd);
 	return 0;
 }

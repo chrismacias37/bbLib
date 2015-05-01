@@ -20,7 +20,9 @@ int main(void)
 	int pinValue;
 	int value;
 
-	int didItInit=gpioinit();
+	int fd;
+	fd=open("/dev/mem",O_RDWR);
+	int didItInit=gpioinit(fd);
 	if(didItInit==-1)
 	{
 		fprintf(stderr,"\n%s", "Could not initialize a gpio bank");
@@ -71,6 +73,6 @@ int main(void)
 	{
 		gpiowrite(bank, pin, value);
 	}
-	gpiodone();
+	gpiodone(fd);
 	return 0;
 }
