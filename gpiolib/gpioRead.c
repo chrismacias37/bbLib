@@ -6,16 +6,12 @@
  */
 
 
-#include<stdio.h>
 #include<fcntl.h>
 #include"gpiommap.h"
 
-int gpioRead(int bank, int pin)
+int gpioRead(gpioBank *bank, int pin)
 {
-
-	unsigned volatile int *gpioDataInput=NULL;//This on is an int because it is 32bits or 4 bytes
 	unsigned int dataInputValues;//Will store the Output Enable values
-	int returnVal;//Save the return Value
 
 	//Removed after the addition of gpioinit.c
 //	if(bank==0)//will check the which gpio bank is selected and allocate the memory and return the address
@@ -47,10 +43,9 @@ int gpioRead(int bank, int pin)
 //		return -1;
 //	}
 
-	gpioDataInput=gpioAddress[bank]+GPIODATIN;
-	dataInputValues=*gpioDataInput;
+	dataInputValues=*(bank->dataIn);
 
-	if(((~(dataInputValues)|(1<<pin))&dataInputValues)==0)
+	if((dataInputValues&(1<<pin))==0)
 	{
 		return 0;
 	}

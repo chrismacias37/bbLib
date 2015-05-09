@@ -12,26 +12,21 @@
 
 int main(void)
 {
-	int bank;
+	int bankNumber;
 	int pin;
 	char direction[5];
 	int errorCheck;
 	int loop=1;
 	int pinValue;
 	int value;
+	gpioBank bank;
 
 	int fd;
 	fd=open("/dev/mem",O_RDWR);
-	int didItInit=gpioinit(fd);
-	if(didItInit==-1)
-	{
-		fprintf(stderr,"\n%s", "Could not initialize a gpio bank");
-		return -1;
-	}
 	system("clear");
 	printf("%s\n", "What GPIO bank do you wish to set as input or output? 0, 1, 2, or 3: ");
 	fflush(stdout);
-	fscanf(stdin, "%ui1", &bank);
+	fscanf(stdin, "%ui1", &bankNumber);
 	fflush(stdin);
 
 	printf("\n%s\n", "What pin do you wish to edit or read the value of? 0-31: ");
@@ -50,29 +45,31 @@ int main(void)
 	fflush(stdin);
 
 	printf("\n%s", "Here is what you typed");
-	printf("\n%s%u", "Bank:", bank);
+	printf("\n%s%u", "Bank:", bankNumber);
 	printf("\n%s%u", "Pin:", pin);
 	printf("\n%s%s", "Direction:", direction);
-	printf("\n%s%u\n", "Value to write:", pin);
+	printf("\n%s%u\n", "Value to write:", value);
 
-	gpiodirection(bank, pin, direction);
+	gpioinit(fd, bankNumber, &bank);
+	gpiodirection(&bank, pin, direction);
 
 	if(strncmp("in",direction,2)==0)
 	{
-		pinValue=gpioRead(bank,pin);
+		pinValue=gpioRead(&bank,pin);
 		printf("\n%s%u","Current Value:", pinValue);
 		while(loop==1)
 		{
 			printf("\n%s", "Would you like to read the value of the pin again? (1)Yes (0)No: ");
 			scanf("%u1", &loop);
-			pinValue=gpioRead(bank,pin);
+			pinValue=gpioRead(&bank,pin);
 			printf("\n%s%u","Current Value:", pinValue);
 		}
 	}
 	if(strncmp("ou",direction,2)==0)
 	{
-		gpiowrite(bank, pin, value);
+		gpiowrite(&bank, pin, value);
 	}
-	gpiodone(fd);
+	gpiodone(bank);
+	close(fd);
 	return 0;
 }

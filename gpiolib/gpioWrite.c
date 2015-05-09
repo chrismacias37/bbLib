@@ -4,18 +4,12 @@
  *  Created on: Apr 30, 2015
  *      Author: christian
  */
-#include <stdio.h>
 #include <stdlib.h>
-#include<fcntl.h>
 #include"gpiommap.h"
 
 
-int gpiowrite(int bank, int pin, int value)
+int gpiowrite(gpioBank *bank, int pin, int value)
 {
-		unsigned volatile int *gpioWriteSet=NULL;
-		unsigned volatile int *gpioWriteClear=NULL;
-		unsigned int oeValue;//Will store the Output Enable values
-
 
 		//Removed because of the addition of gpioinit.c
 //		switch(bank)//Seems much more efficient and cleaner to write...
@@ -27,7 +21,7 @@ int gpiowrite(int bank, int pin, int value)
 //		}
 
 
-		//Commented to test out switch statements above
+		//Commented to test out gpioInit and swtich statement(Which is now commented out)
 //		if(bank==0)//will check the which gpio bank is selected and allocate the memory and return the address
 //		{
 //			gpioBaseAddress=mmap(0, 4096, PROT_READ | PROT_WRITE , MAP_SHARED, fd, GPIO0BASE);
@@ -57,20 +51,20 @@ int gpiowrite(int bank, int pin, int value)
 //			return -1;
 //		}
 
-		//Sets the memory addresses
-		gpioWriteSet=gpioAddress[bank]+GPIOSETDATOUT;
-		gpioWriteClear=gpioAddress[bank]+GPIOCLRDATOUT;
+		//Sets the memory addresses. No longer needed because of gpioinit
+//		gpioWriteSet=gpioAddress[bank]+GPIOSETDATOUT;
+//		gpioWriteClear=gpioAddress[bank]+GPIOCLRDATOUT;
 
 		if(value==0)
 		{
 			//write 1 to the clear register
-			*gpioWriteClear=(1<<pin);
+			*(bank->clearDataOut)=(1<<pin);
 		}
 
 		if(value==1)
 		{
-			//write 0 to the set register
-			*gpioWriteSet=(1<<pin);
+			//write 1 to the set register
+			*(bank->setDataOut)=(1<<pin);
 		}
 
 	return 0;

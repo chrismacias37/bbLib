@@ -5,15 +5,11 @@
  *      Author: christian
  */
 
+#include"gpiommap.h"
+#include<sys/mman.h>
 
-int gpioDone(int fd)
+int gpiodone(gpioBank *addresses)
 {
-	int counter1;
-
-	while (counter1<3)
-	{
-		munmap(gpioAddress[counter1] ,4096);
-	}
-	close(fd);
+	munmap((void *)addresses->baseAddress,4096);
 	return 0;
 }
