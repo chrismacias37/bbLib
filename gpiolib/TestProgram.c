@@ -19,10 +19,8 @@ int main(void)
 	int loop=1;
 	int pinValue;
 	int value;
-	gpioBank bank;
+	gpioBank *bank;//Creates the pointer that will hold the structure to store all the address for the gpio bank
 
-	int fd;
-	fd=open("/dev/mem",O_RDWR);
 	system("clear");
 	printf("%s\n", "What GPIO bank do you wish to set as input or output? 0, 1, 2, or 3: ");
 	fflush(stdout);
@@ -50,26 +48,25 @@ int main(void)
 	printf("\n%s%s", "Direction:", direction);
 	printf("\n%s%u\n", "Value to write:", value);
 
-	gpioinit(fd, bankNumber, &bank);
-	gpiodirection(&bank, pin, direction);
+	bank=gpioinit(bankNumber);
+	gpiodirection(bank, pin, direction);
 
 	if(strncmp("in",direction,2)==0)
 	{
-		pinValue=gpioRead(&bank,pin);
+		pinValue=gpioRead(bank,pin);
 		printf("\n%s%u","Current Value:", pinValue);
 		while(loop==1)
 		{
 			printf("\n%s", "Would you like to read the value of the pin again? (1)Yes (0)No: ");
 			scanf("%u1", &loop);
-			pinValue=gpioRead(&bank,pin);
+			pinValue=gpioRead(bank,pin);
 			printf("\n%s%u","Current Value:", pinValue);
 		}
 	}
 	if(strncmp("ou",direction,2)==0)
 	{
-		gpiowrite(&bank, pin, value);
+		gpiowrite(bank, pin, value);
 	}
-	gpiodone(bank);
-	close(fd);
+	gpiodone(bank);//Don't forget to close the banks you aren't going to use.
 	return 0;
 }

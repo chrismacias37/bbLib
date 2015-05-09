@@ -9,44 +9,57 @@
 #include<sys/mman.h>
 #include"gpiommap.h"
 
+int openGpioBanks;
 
-void gpioinit(int fd, int bank, gpioBank *memoryAllocated)
+
+gpioBank *gpioinit(int bank)
 {
+	gpioBank *bankToReturn;
+	static int fd=0;
+
+	if(fd<=0){
+		fd=open("/dev/mem",O_RDWR);
+	}
+	bankToReturn=malloc(sizeof(gpioBank));//Allocated memory to store all the addresses and be able to return it
 	if(fd < 0)
 	{
 		fprintf(stderr,"\n%s", "Error in gpioinit.c: file descriptor is invalid.");
-		return;
+		return NULL;
 	}
 	if(bank==0)
 	{
-		memoryAllocated->baseAddress=mmap(0, 4096, PROT_READ | PROT_WRITE, MAP_SHARED, fd, GPIO0BASE);
+		bankToReturn->baseAddress=mmap(0, 4096, PROT_READ | PROT_WRITE, MAP_SHARED, fd, GPIO0BASE);
+		bankToReturn->fd=fd;
 	}
 	else if(bank==1)
 	{
-		memoryAllocated->baseAddress=mmap(0, 4096, PROT_READ | PROT_WRITE, MAP_SHARED, fd, GPIO1BASE);
+		bankToReturn->baseAddress=mmap(0, 4096, PROT_READ | PROT_WRITE, MAP_SHARED, fd, GPIO1BASE);
+		bankToReturn->fd=fd;
 	}
 	else if(bank==2)
 	{
-		memoryAllocated->baseAddress=mmap(0,4096, PROT_READ | PROT_WRITE, MAP_SHARED, fd, GPIO2BASE);
+		bankToReturn->baseAddress=mmap(0,4096, PROT_READ | PROT_WRITE, MAP_SHARED, fd, GPIO2BASE);
+		bankToReturn->fd=fd;
 	}
 	else if(bank==3)
 	{
-		memoryAllocated->baseAddress=mmap(0, 4096, PROT_READ | PROT_WRITE, MAP_SHARED, fd, GPIO3BASE);
+		bankToReturn->baseAddress=mmap(0, 4096, PROT_READ | PROT_WRITE, MAP_SHARED, fd, GPIO3BASE);
+		bankToReturn->fd=fd;
 	}
 	else
 	{
 		fprintf(stderr, "\n%s\n\t%s%i\n\t%s", "Error in gpioinit.c: Selected bank is out of range.", "You "
 				"selected: " , bank, "Possible choices are 0, 1, 2, 3");
-		return;
+		return NULL;
 	}
 
-	memoryAllocated->outputEnable=(memoryAllocated->baseAddress)+GPIOOE;
-	memoryAllocated->dataIn=(memoryAllocated->baseAddress)+GPIODATIN;
-	memoryAllocated->dataOut=(memoryAllocated->baseAddress)+GPIODATOUT;
-	memoryAllocated->setDataOut=(memoryAllocated->baseAddress)+GPIOSETDATOUT;
-	memoryAllocated->clearDataOut=(memoryAllocated->baseAddress)+GPIOCLRDATOUT;
+	bankToReturn->outputEnable=(bankToReturn->baseAddress)+GPIOOE;
+	bankToReturn->dataIn=(bankToReturn->baseAddress)+GPIODATIN;
+	bankToReturn->dataOut=(bankToReturn->baseAddress)+GPIODATOUT;
+	bankToReturn->setDataOut=(bankToReturn->baseAddress)+GPIOSETDATOUT;
+	bankToReturn->clearDataOut=(bankToReturn->baseAddress)+GPIOCLRDATOUT;
 
+	openGpioBanks++;
 
-
-	return;
+	return bankToReturn;
 }

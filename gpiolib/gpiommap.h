@@ -7,13 +7,13 @@
  */
 
 #include<stdio.h>
-#include <sys/mman.h>
+#include<stdlib.h>
 #include<fcntl.h>
 
 #ifndef GPIOMMAP_H_
 #define GPIOMMAP_H_
 
-//The following are the base address to the GPIO banks
+//The following are the physical base address to the GPIO banks in memory
 #define GPIO0BASE 0x44E07000
 #define GPIO1BASE 0x4804C000
 #define GPIO2BASE 0x481AC000
@@ -28,17 +28,25 @@
 #define GPIOCLRDATOUT 0x190 //Turn off the gpio for selected pin
 #define GPIOSETDATOUT 0x194 //Turn on the gpio for selected pin
 
-/*
- * This is an attempt to make the program more efficient. Ill be making a data structure to store the address of gpio addresses
- */
+typedef struct gpioProperties
+{
+	volatile void *baseAddress;//Will store the virtual base memory address
+	volatile int *outputEnable;//Will be the base + OE GPIOOE
+	volatile int *dataIn;//Same operation Base + OFFSET
+	volatile int *dataOut;//Same operation Base + OFFSET
+	volatile int *clearDataOut;//Same operation Base + OFFSET
+	volatile int *setDataOut;//Same operation Base + OFFSET
+	int fd;//File descriptor. All of the structs created will have the same value here.
 
-void volatile *gpioAddress[4];//Will store the address to the gpioBanks
+}gpioBank;
 
-int gpioinit();//Sets the address to the gpioBanks.
-int gpioDone();//Clears the allocated memory.
-int gpiodirection(int bank, int pin, char *direction);
-int gpioRead(int bank, int pin);
-int gpiowrite(int bank, int pin, int value);
+gpioBank *gpioinit(int bank);//Sets the address to the gpioBanks.
+int gpioDone(gpioBank *);//Clears the allocated memory.
+int gpiodirection(gpioBank *bank, int pin, char *direction);//Sets GPIO Direction
+int gpioRead(gpioBank *bank, int pin);//Reads GPIO if input
+int gpiowrite(gpioBank *bank, int pin, int value);//Write a value to GPIO
+
+extern int openGpioBanks; //Stores how many gpio banks are opened. Declared in the first run of gpioinit
 
 
 #endif /* GPIOMMAP_H_ */

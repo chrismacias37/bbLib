@@ -11,5 +11,11 @@
 int gpiodone(gpioBank *addresses)
 {
 	munmap((void *)addresses->baseAddress,4096);
+	free(addresses);
+	openGpioBanks--;
+	if(openGpioBanks==0&&(addresses->fd)>0)
+	{
+		close(addresses->fd);
+	}
 	return 0;
 }
