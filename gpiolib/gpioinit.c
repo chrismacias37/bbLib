@@ -24,6 +24,8 @@ gpioBank *gpioinit(int bank)
 	if(fd < 0)
 	{
 		fprintf(stderr,"\n%s", "Error in gpioinit.c: file descriptor is invalid.");
+		printf("\n%s", "If you get a segmentation fault after this sentence then you you probably aren't running this program as root: ");
+		fflush(stdout);
 		return NULL;
 	}
 	if(bank==0)
