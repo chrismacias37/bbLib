@@ -4,7 +4,6 @@
  *  Created on: Apr 30, 2015
  *      Author: christian
  */
-#include <stdlib.h>
 #include"gpiommap.h"
 
 
