@@ -7,6 +7,7 @@
 #include<fcntl.h>
 #include<sys/mman.h>
 #include"mux.h"
+#include<string.h>
 
 /*
  * This function will allocate the virtual memory and assign it to each individual pin.
@@ -17,12 +18,22 @@
 
 int fdMux=0;
 pinMux pins; //This is in the header file with extern. All functions may read this structure.
+FILE * errLog;//In header, Accessible by all the program.
 
 int initmux()
 {
+	if(strncmp(ERRORLOG, "s", 1)!=0)
+	{//sets up the error log
+
+		errLog=fopen(ERRORLOG, "w+");
+	}
+	else
+	{
+		errLog=stderr;
+	}
 	if(pins.baseAddress!=0)
 	{
-		fprintf(stderr,"\n%s", "Error in: initmux - addresses are already allocated! ");
+		fprintf(errLog,"\n%s", "Error in: initmux - addresses are already allocated! ");
 		return -1;
 	}
 	else
@@ -33,7 +44,7 @@ int initmux()
 
 	if(pins.baseAddress==MAP_FAILED)
 	{
-		fprintf(stderr, "\n%s", "Error in: initmux - Could not set up base address. Running as root?");
+		fprintf(errLog, "\n%s", "Error in: initmux - Could not set up base address. Running as root?");
 		return -1;
 	}
 

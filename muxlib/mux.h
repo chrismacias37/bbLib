@@ -186,6 +186,13 @@ extern int fdMux;
 extern pinMux pins;
 
 
+/*
+ * If you dont want errors going to the text console, you can define a path for a log
+ * file to go to. This will create the file. Make sure the program can access because if
+ * it cant the program will give strange results.
+ */
+#define ERRORLOG "stderr"
+extern FILE * errLog;
 
 
 #endif /* MUX_H_ */
