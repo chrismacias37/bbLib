@@ -1,13 +1,15 @@
 /*
  * mux.h
  *
- *  Created on: May 10, 2015
- *      Author: christian
+ *      Author: Christian Macias
+ *      Description: This Library contains all the functions necessary to edit and read the pin mux
+ *      				current may not be extremely efficient but works perfectly.
+ *      				I left room for expansion by adding a structure that you can add more to.
  */
 
 /*
- * Ok, this header file looks scary but it's just define the physical memory locations
- * of the control register that will control the pin mux.
+ * This header file looks scary but it's just defines the physical memory locations
+ * of the control register that will control the pin mux and control registers.
  */
 
 
@@ -16,9 +18,9 @@
 
 #include<stdio.h>
 
-int initmux();
-void muxdone(void);
-int chkpinmode(int header, int pin);
+int initmux();//Must be run before any other funtion
+void muxdone(void);//Releases any alocated memory and file descriptors
+int chkpinmode(int header, int pin);//Checks the current mode of the pin.
 /*
  * SetPinMode
  * 	Header: 8 or 9
@@ -28,6 +30,8 @@ int chkpinmode(int header, int pin);
  * 	PulUpDown: (0) Pull Down (1)Pull Up
  * 	PullEnable: (0)Enabled (1)Disabled
  * 	Mode: Mode 0-7 on the selected pin
+ * 	To leave any of the parameters as they current are type a negative integer and they
+ * 		will be left at their current value.
  */
 int setpinmode(int header, int pin, int slew, int rx_Buffer, int pullUpDown, int pullEnable, int mode);
 
@@ -107,10 +111,7 @@ int setpinmode(int header, int pin, int slew, int rx_Buffer, int pullUpDown, int
 typedef struct pinMuxAddress
 {	/*
 	 * I Know.. the structure is huge and it takes a crap load of memory but it attacking
-	 * this with brute force until i have it up and running. Its 256+ bytes... but..
-	 * you only need one.
-	 *
-	 * WARNING: Do not move the structures position around! It will mess up chkpinmode.c
+	 * this with brute force until i have it up and running.
 	 */
 	volatile void *baseAddress;
 	volatile unsigned int *p8_3;
@@ -184,7 +185,7 @@ typedef struct pinMuxAddress
 
 extern int fdMux;
 extern pinMux pins;
-
+extern pinmode(int header ,int pin);//Returns pin mode NO ERROR CHECKING
 
 /*
  * If you dont want errors going to the text console, you can define a path for a log

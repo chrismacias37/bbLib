@@ -8,6 +8,7 @@
  */
 #include<sys/mman.h>
 #include"gpiommap.h"
+#include<stdlib.h>
 
 int openGpioBanks;
 

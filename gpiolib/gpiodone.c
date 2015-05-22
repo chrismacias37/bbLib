@@ -7,6 +7,7 @@
 
 #include"gpiommap.h"
 #include<sys/mman.h>
+#include<stdlib.h>
 
 int gpiodone(gpioBank *addresses)
 {
